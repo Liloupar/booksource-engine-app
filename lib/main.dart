@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_js/flutter_js.dart';
 
 void main() {
   runApp(const MyApp());
-  print("123123");
 }
 
 class MyApp extends StatelessWidget {
@@ -59,6 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      JsEvalResult jsResult = getJavascriptRuntime().evaluate(
+          "Math.trunc(Math.random() * 100).toString();");
+      print("123123:" + jsResult.stringResult);
     });
   }
 
@@ -97,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'You have pushed the button this many times111:',
             ),
             Text(
               '$_counter',
