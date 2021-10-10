@@ -51,7 +51,83 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _incrementCounter() async {
+    var flutterJs =
+        getJavascriptRuntime();
+    flutterJs.evaluate(r'''
+      
+const baseUrl = "https://api.wan123x.com"
+
+//搜索
+const search = async (key) => {
+  console.log(123);
+        const response = await fetch('https://reqres.in/api/users?page=2');
+            console.log("response");
+      const body = await response.json();
+  console.log(body);
+  let array = []
+  let $ = JSON.parse(response)
+  $.data.forEach((child) => {
+    array.push({
+      name: child.book_name,
+      author: child.author_name,
+      cover: child.cover_url,
+      detail: `${baseUrl}/read/getBookDetail?book_id=${child.book_id}`,
+    })
+  })
+  return JSON.stringify(array)
+}
+
+//详情
+const detail = (url) => {
+  let response = GET(url)
+  let $ = JSON.parse(response).data
+  let book = {
+    summary: $.intro,
+    words: $.words,
+    catalog: $.book_id
+  }
+  return JSON.stringify(book)
+}
+
+//目录
+const catalog = (url) => {
+  let response = GET(`${baseUrl}/read/getCatalog?book_id=${url}&catalog_order=asc`)
+  let $ = JSON.parse(response)
+  let array = []
+  $.data.forEach((chapter) => {
+      array.push({
+        name: chapter.chapter_name,
+        url: `${baseUrl}/read/getChapterDetail?book_id=${url}&chapter_id=${chapter.chapter_id}`
+      })
+    })
+  return JSON.stringify(array)
+}
+
+//章节
+const chapter = (url) => {
+    let $ = JSON.parse(GET(url))
+  return $.data.content.trim()
+}
+
+var bookSource = JSON.stringify({
+  name: "花生小说",
+  url: "wan123x.com",
+  version: 100
+})
+      ''');
+    flutterJs.enableHandlePromises();
+    var asyncResult = flutterJs.evaluate("search('诡秘之主');");
+    var s = asyncResult.stringResult;
+    flutterJs.executePendingJob();
+    // final promiseResolved = await flutterJs.handlePromise(asyncResult);
+    // var result = promiseResolved.stringResult;
+    // print("result=" + result);
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -59,9 +135,6 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      JsEvalResult jsResult = getJavascriptRuntime().evaluate(
-          "Math.trunc(Math.random() * 100).toString();");
-      print("123123:" + jsResult.stringResult);
     });
   }
 
